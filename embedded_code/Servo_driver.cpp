@@ -7,19 +7,31 @@ Servo::Servo(int pin){
         return 1;
     }*/
    //gpioTerminate()
-    gpioServo(servoPin, 1500);
+    setPosition(90)
 }
 
-void Servo::setPosition(int angle){
-    angle = min(this->maxAngle,min(this->minAngle,pos));
-    const int Pulse = this->minPulseWidth + (angle - this->minAngle) * (this->maxPulseWidth - this->minPulseWidth) / (this->maxAngle - this->minAngle); 
-    gpioServo(this->servoPin, Pulse);
+void Servo::setPosition(double angle){
+    if(angle == currAngle)
+        return ;
+    this->currAngle = min(this->maxAngle,max(this->minAngle,angle));
+    this->currentPulse = static_cast<int>(this->minPulseWidth + (currAngle - this->minAngle) * (this->maxPulseWidth - this->minPulseWidth) / (this->maxAngle - this->minAngle));
 }
 
 void Servo::DisableServo(){
-    gpioServo(this->servoPin, 0);
+    this->IsDisabled = true;
+}
+void Servo::EnableServo(){
+    this->IsDisabled = false;
+}
+
+void Servo::update(){
+    if(this->isDisabled)
+        gpioSetServoPulsewidth(this->servoPin, 0);
+    else
+        gpioSetServoPulsewidth(this->servoPin, this->currentPulse);
 }
 
 Servo::~Servo(){
-    gpioServo(this->servoPin, 0);
+    gpioSetServoPulsewidth(this->servoPin, 0);
 }
+

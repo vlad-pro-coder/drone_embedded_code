@@ -46,21 +46,51 @@ private:
 };
 
 class Servo {
-    public:
+public:
     Servo(int pin);
     ~Servo();
 
     // Get latest orientation; respects frequency limit
-    void setPosition();
+    void setPosition(double pos);
     void DisableServo();
+    void EnableServo();
+    void update();
 
 private:
     const int minPulseWidth = 1000;  // 1 ms pulse - 0 deg
     const int maxPulseWidth = 2000;  // 2 ms pulse - 180 deg
-    const int minAngle = 0;  // 1 ms pulse - 0 deg
-    const int maxAngle = 180;  // 2 ms pulse - 180 deg
+    const double minAngle = 0;  // 1 ms pulse - 0 deg
+    const double maxAngle = 180;  // 2 ms pulse - 180 deg
     int currPos = 90;
     int servoPin = 0;
+    int currentPulse = 0;
+    bool IsDisabled = false;
+}
+
+class Motor {
+public:
+    Motor(int pin);
+    ~Motor();
+
+    // Get latest orientation; respects frequency limit
+    void setPower(double power);
+    void DisableMotor();
+    void EnableMotor();
+    void EnableOneShot();
+    void DisableOneShot();
+
+private:
+    const int minPulseWidthPWM = 1000;  
+    const int maxPulseWidthPWM = 2000;  
+    const int minPulseWidthOneShot = 125;  
+    const int maxPulseWidthOneShot = 250;  
+    int currentUsedPulseMin = minPulseWidthPWM;
+    int currentUsedPulseMax = maxPulseWidthPWM;
+    const double minPower = 0.0;  
+    const double maxPower = 1.0;  
+    bool isDisabled = false;
+    double currPower = 0;
+    int motorPin = 0;
 
 }
 
