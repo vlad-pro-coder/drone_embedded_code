@@ -6,10 +6,17 @@
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
 #include <pigpio.h>
+#include <syslog.h>
 #include <cmath>
 #include <cstring>
 #include <stdexcept>
 #include <iostream>
+#include <cstdint>
+#include <cstdio>
+#include <csignal>
+#include <atomic>
+#include <fstream>
+#include <opencv2/opencv.hpp>
 
 #define BNO085_ADDR 0x4A
 #define CHANNEL_COMMAND 0xF9
@@ -18,15 +25,17 @@
 #define SENSOR_REPORTID_ROTATION_VECTOR 0x05
 #define FEATURE_ROTATION_VECTOR 0x05
 
-struct Orientation {
+struct Orientation
+{
     float yaw;
     float pitch;
     float roll;
 };
 
-class IMU_BNO085 {
+class IMU_BNO085
+{
 public:
-    IMU_BNO085(int i2cBus,int frequency);
+    IMU_BNO085(int i2cBus, int frequency);
     ~IMU_BNO085();
 
     // Get latest orientation; respects frequency limit
@@ -40,12 +49,13 @@ private:
 
     int i2c_fd;
 
-    float yaw,pitch,roll;
-    
+    float yaw, pitch, roll;
+
     // I2C device handle, initialization, etc. omitted for brevity
 };
 
-class Servo {
+class Servo
+{
 public:
     Servo(int pin);
     ~Servo();
@@ -57,17 +67,18 @@ public:
     void update();
 
 private:
-    const int minPulseWidth = 1000;  // 1 ms pulse - 0 deg
-    const int maxPulseWidth = 2000;  // 2 ms pulse - 180 deg
-    const double minAngle = 0;  // 1 ms pulse - 0 deg
-    const double maxAngle = 180;  // 2 ms pulse - 180 deg
+    const int minPulseWidth = 1000; // 1 ms pulse - 0 deg
+    const int maxPulseWidth = 2000; // 2 ms pulse - 180 deg
+    const double minAngle = 0;      // 1 ms pulse - 0 deg
+    const double maxAngle = 180;    // 2 ms pulse - 180 deg
     int currPos = 90;
     int servoPin = 0;
     int currentPulse = 0;
     bool IsDisabled = false;
 }
 
-class Motor {
+class Motor
+{
 public:
     Motor(int pin);
     ~Motor();
@@ -80,18 +91,49 @@ public:
     void DisableOneShot();
 
 private:
-    const int minPulseWidthPWM = 1000;  
-    const int maxPulseWidthPWM = 2000;  
-    const int minPulseWidthOneShot = 125;  
-    const int maxPulseWidthOneShot = 250;  
+    const int minPulseWidthPWM = 1000;
+    const int maxPulseWidthPWM = 2000;
+    const int minPulseWidthOneShot = 125;
+    const int maxPulseWidthOneShot = 250;
     int currentUsedPulseMin = minPulseWidthPWM;
     int currentUsedPulseMax = maxPulseWidthPWM;
-    const double minPower = 0.0;  
-    const double maxPower = 1.0;  
+    const double minPower = 0.0;
+    const double maxPower = 1.0;
     bool isDisabled = false;
     double currPower = 0;
     int motorPin = 0;
+}
 
+class CameraDriver
+{
+private:
+    cv::VideoCapture cap;
+    int width, height;
+
+public:
+    CameraDriver(int deviceIndex = 0, int w = 416, int h = 416);
+    cv::Mat captureFrame();
+    ~CameraDriver();
+}
+
+class VL53L0XDriver
+{
+public:
+    VL53L0XDriver(int addr = 0x29);
+    uint16_t readDistance();
+    void logDistance(uint16_t distance);
+    static void signalHandler(int sig);
+    ~VL53L0XDriver();
+
+private:
+    int address;
+    int fd;
+    uint8_t buffer[2];
+    uint8_t regData;
+    static std::atomic<bool> running;
+    bool initializeSensor();
+    bool writeReg(uint8_t reg, uint8_t value);
+    uint8_t readReg(uint8_t reg);
 }
 
 #endif

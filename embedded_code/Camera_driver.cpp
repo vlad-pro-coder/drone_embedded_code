@@ -1,48 +1,44 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
+#include "./All_drivers_Header.hpp"
 
-class CameraDriver {
-private:
-    cv::VideoCapture cap;
-    int width, height;
-
-public:
-    CameraDriver(int deviceIndex = 0, int w = 416, int h = 416) 
-        : width(w), height(h)
+CameraDriver::CameraDriver(int deviceIndex = 0, int w = 416, int h = 416)
+    : width(w), height(h)
+{
+    cap.open(deviceIndex, cv::CAP_V4L2);
+    if (!cap.isOpened())
     {
-        cap.open(deviceIndex, cv::CAP_V4L2);
-        if (!cap.isOpened()) {
-            std::cerr << "ERROR: Cannot open camera\n";
-            exit(1);
-        }
-
-        cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
-        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+        std::cerr << "ERROR: Cannot open camera\n";
+        exit(1);
     }
 
-    cv::Mat captureFrame() {
-        cv::Mat frame, rgb, resized;
-        cap >> frame;
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+}
 
-        if (frame.empty()) {
-            std::cerr << "ERROR: Empty frame\n";
-            return {};
-        }
+cv::Mat CameraDriver::captureFrame()
+{
+    cv::Mat frame, rgb, resized;
+    cap >> frame;
 
-        cv::cvtColor(frame, rgb, cv::COLOR_BGR2RGB);
-
-        cv::resize(rgb, resized, cv::Size(width, height));
-
-        resized.convertTo(resized, CV_32F, 1.0 / 255.0);
-        return resized;
+    if (frame.empty())
+    {
+        std::cerr << "ERROR: Empty frame\n";
+        return {};
     }
 
-    ~CameraDriver() {
-        cap.release();
-    }
-};
+    cv::cvtColor(frame, rgb, cv::COLOR_BGR2RGB);
 
-int main() {
+    cv::resize(rgb, resized, cv::Size(width, height));
+
+    resized.convertTo(resized, CV_32F, 1.0 / 255.0);
+    return resized;
+}
+
+CameraDriver::~CameraDriver()
+{
+    cap.release();
+}
+
+/*int main() {
     CameraDriver camera;
 
     while (true) {
@@ -58,4 +54,4 @@ int main() {
     }
 
     return 0;
-}
+}*/
