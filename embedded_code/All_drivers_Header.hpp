@@ -17,6 +17,8 @@
 #include <atomic>
 #include <fstream>
 #include <opencv2/opencv.hpp>
+#include <termios.h>
+#include <cstdlib>
 
 #define BNO085_ADDR 0x4A
 #define CHANNEL_COMMAND 0xF9
@@ -31,6 +33,13 @@ struct Orientation
     float pitch;
     float roll;
 };
+
+struct GPS_Data
+{
+    int message;
+    double lat;
+    double lon;
+}
 
 class IMU_BNO085
 {
@@ -134,6 +143,19 @@ private:
     bool initializeSensor();
     bool writeReg(uint8_t reg, uint8_t value);
     uint8_t readReg(uint8_t reg);
+}
+
+class GPS
+{
+private:
+    int serial_fd;
+    bool setupSerial(const char *port);
+    double convertToDecimal(const char *coord, const char dir);
+
+public:
+    GPS(const char *port = "/dev/serial0");
+    ~GPS();
+    getCoordinates(double &lat, double &lon);
 }
 
 #endif
