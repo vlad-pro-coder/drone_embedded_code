@@ -18,7 +18,7 @@ int main() {
     softPwmCreate(SERVO_PITCH_PIN, 0, 250);
     softPwmCreate(SERVO_ROLL_PIN, 0, 250);
 
-    IMU_BNO085 imu(1, 50); // I2C bus 1, 50Hz update rate
+    IMU_BNO085 imu(1, 50); // 50Hz update rate
 
     const int PITCH_CENTER = 90;
     const int ROLL_CENTER  = 90;
