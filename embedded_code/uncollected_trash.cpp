@@ -1,7 +1,16 @@
-#include "./All_drivers_Header.hpp"
+// trash_collector.cpp
+#include "./All_drivers_Header.hpp" // must provide VL53L0XDriver, GPS, GPS_Data
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <fstream>
+#include <string>
+#include <csignal>
+#include <syslog.h>
+#include <unistd.h>     // usleep
+#include <cstdint>      // uint16_t
+#include <cerrno>
+#include <cstring>      // strerror
 
 #define SERVO_PIN 18 // Servo pin on Raspberry Pi GPIO
 #define CLAW_OPEN_PULSE 1500 // microseconds
@@ -11,12 +20,13 @@
 #define SERVO_DELAY 10    // ms delay per step
 #define LOG_FILE "/home/pi/trash_coordinates.log"
 
-static std::atomic<bool> running(true);
+// Signal-safe flag
+static volatile sig_atomic_t running_flag = 1;
 
-void signalHandler(int sig)
+extern "C" void signalHandler(int /*sig*/)
 {
-    running = false;
-    syslog(LOG_INFO, "Shutdown signal received");
+    // Don't call non async-signal-safe functions here (no syslog, no i/o)
+    running_flag = 0;
 }
 
 // Move servo smoothly
@@ -27,7 +37,7 @@ void moveServoSmooth(int pin, int startPulse, int endPulse, int step, int delayM
         for (int pulse = startPulse; pulse <= endPulse; pulse += step)
         {
             gpioServo(pin, pulse);
-            usleep(delayMs * 1000);
+            usleep(static_cast<useconds_t>(delayMs) * 1000);
         }
     }
     else
@@ -35,7 +45,7 @@ void moveServoSmooth(int pin, int startPulse, int endPulse, int step, int delayM
         for (int pulse = startPulse; pulse >= endPulse; pulse -= step)
         {
             gpioServo(pin, pulse);
-            usleep(delayMs * 1000);
+            usleep(static_cast<useconds_t>(delayMs) * 1000);
         }
     }
 }
@@ -44,72 +54,82 @@ void moveServoSmooth(int pin, int startPulse, int endPulse, int step, int delayM
 void logCoordinates(double lat, double lon, const std::string& action)
 {
     std::ofstream logFile(LOG_FILE, std::ios::app);
-    if (logFile.is_open())
+    if (!logFile.is_open())
     {
-        auto now = std::chrono::system_clock::now();
-        auto time_t = std::chrono::system_clock::to_time_t(now);
-        
-        logFile << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S") 
-                << " | Action: " << action 
-                << " | Latitude: " << std::fixed << std::setprecision(6) << lat 
-                << " | Longitude: " << std::fixed << std::setprecision(6) << lon 
-                << std::endl;
-        
-        logFile.close();
-        syslog(LOG_INFO, "Logged %s at coordinates: %.6f, %.6f", action.c_str(), lat, lon);
+        syslog(LOG_ERR, "Failed to open log file: %s (errno=%d: %s)", LOG_FILE, errno, strerror(errno));
+        return;
+    }
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm tm{};
+    if (localtime_r(&now_c, &tm) == nullptr)
+    {
+        syslog(LOG_WARNING, "localtime_r failed");
+        logFile << "TIME-ERROR | ";
     }
     else
     {
-        syslog(LOG_ERR, "Failed to open log file: %s", LOG_FILE);
+        logFile << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " | ";
     }
+
+    logFile << "Action: " << action
+            << " | Latitude: " << std::fixed << std::setprecision(6) << lat
+            << " | Longitude: " << std::fixed << std::setprecision(6) << lon
+            << std::endl;
+
+    logFile.close();
+    syslog(LOG_INFO, "Logged %s at coordinates: %.6f, %.6f", action.c_str(), lat, lon);
 }
 
 int main()
 {
     openlog("TrashCollector", LOG_PID, LOG_DAEMON);
-    
+
     if (gpioInitialise() < 0)
     {
         syslog(LOG_ERR, "Failed to initialize pigpio");
         return 1;
     }
-    
-    signal(SIGTERM, signalHandler);
-    signal(SIGINT, signalHandler);
-    
+
+    // Set up signal handlers (safe: handler only sets running_flag)
+    std::signal(SIGTERM, signalHandler);
+    std::signal(SIGINT, signalHandler);
+
     try
     {
-        // Initialize distance sensor
+        // Initialize distance sensor and GPS
         VL53L0XDriver sensor;
-        
-        // Initialize GPS
         GPS gps("/dev/serial0");
-        
+
         // Setup servo for claw control
         gpioSetMode(SERVO_PIN, PI_OUTPUT);
         int currentPulse = CLAW_CLOSE_PULSE;
         gpioServo(SERVO_PIN, currentPulse);
-        
-        // Track claw state to detect transitions
+
         bool clawIsOpen = false;
-        bool previousClawState = false;
-        
+
         // Create/clear log file header
-        std::ofstream logFile(LOG_FILE, std::ios::trunc);
-        if (logFile.is_open())
         {
-            logFile << "=== Trash Collection GPS Log ===" << std::endl;
-            logFile << "Format: Timestamp | Action | Latitude | Longitude" << std::endl;
-            logFile << "===================================" << std::endl;
-            logFile.close();
+            std::ofstream header(LOG_FILE, std::ios::trunc);
+            if (header.is_open())
+            {
+                header << "=== Trash Collection GPS Log ===" << std::endl;
+                header << "Format: Timestamp | Action | Latitude | Longitude" << std::endl;
+                header << "===================================" << std::endl;
+            }
+            else
+            {
+                syslog(LOG_WARNING, "Unable to write header to log file: %s", LOG_FILE);
+            }
         }
-        
-        syslog(LOG_INFO, "Trash collector drone started successfully");
-        
-        while (running)
+
+        syslog(LOG_INFO, "Trash collector started successfully");
+
+        while (running_flag)
         {
-            uint16_t distance = sensor.readDistance();
-            
+            uint16_t distance = sensor.readDistance(); // make sure this doesn't block indefinitely
+
             if (distance > 0)
             {
                 // Determine claw state based on distance
@@ -160,20 +180,18 @@ int main()
                     sensor.logDistance(distance);
                 }
             }
-            
-            usleep(50000); // 50ms delay between readings
+
+            usleep(50000); // 50ms
         }
-        
-        // Cleanup on exit
-        syslog(LOG_INFO, "Shutting down trash collector drone");
-        
-        // Final GPS log on shutdown
+
+        // Now that we exited the loop due to signal, do cleanup and final logging
+        syslog(LOG_INFO, "Shutdown requested; performing cleanup");
+
         GPS_Data finalCoords = gps.getCoordinates();
         if (finalCoords.message == 1)
         {
             logCoordinates(finalCoords.lat, finalCoords.lon, "SHUTDOWN");
         }
-        
     }
     catch (const std::exception& e)
     {
@@ -189,11 +207,11 @@ int main()
         closelog();
         return 1;
     }
-    
+
     // Disable servo and cleanup
     gpioServo(SERVO_PIN, 0);
     gpioTerminate();
     closelog();
-    
+
     return 0;
 }
