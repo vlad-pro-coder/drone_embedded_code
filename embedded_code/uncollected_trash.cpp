@@ -1,5 +1,4 @@
-// trash_collector.cpp
-#include "./All_drivers_Header.hpp" // must provide VL53L0XDriver, GPS, GPS_Data
+#include "./All_drivers_Header.hpp" 
 #include <chrono>
 #include <ctime>
 #include <iomanip>
