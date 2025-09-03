@@ -106,7 +106,7 @@ private:
     const int maxPulseWidthOneShot = 250;
     int currentUsedPulseMin = minPulseWidthPWM;
     int currentUsedPulseMax = maxPulseWidthPWM;
-    const double minPower = 0.0;
+    const double minPower = -1.0;
     const double maxPower = 1.0;
     bool isDisabled = false;
     double currPower = 0;

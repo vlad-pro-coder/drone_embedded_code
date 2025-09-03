@@ -1,29 +1,38 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include "../MathHelpers/MathHelpers.hpp"
+#include "../Drivers/All_drivers_Header.hpp"
+
+IMU_BNO085 imu;
 
 class DroneChassis
 {
 public:
-    DroneChassis(int i2cBus, int frequency);
-    ~DroneChassis();
+    DroneChassis();
+    //~DroneChassis();
 
     // Get latest orientation; respects frequency limit
-    void setYaw();
-    void setRoll();
-    void setPitch();
+    void setYaw(double rads);
+    void setRoll(double rads);
+    void setPitch(double rads);
+    void setHeight(double DistMM);
+
+    void drive(double outHeight, double outYaw, double outPitch, double outRoll);
+    void update();
+
+    PIDCoefficients HeightCoefs;
+    PIDCoefficients YawCoefs;
+    PIDCoefficients PitchCoefs;
+    PIDCoefficients RollCoefs;
 
 private:
-    void parse_orientation();
-    void read_packet();
-    void enable_rotation_vector();
-    void initialize();
+    PIDController HeightPID;
+    PIDController YawPID;
+    PIDController PitchPID;
+    PIDController RollPID;
 
-    int i2c_fd;
-
-    float yaw, pitch, roll;
-
-    // I2C device handle, initialization, etc. omitted for brevity
+    Motor m1,m2,m3,m4;
 };
 
 
