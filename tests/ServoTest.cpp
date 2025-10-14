@@ -2,10 +2,12 @@
 #include <iostream>
 #include <unistd.h> // for usleep
 
+//g++ ServoTest.cpp -o servo -lpigpio -lpthread
+
 int main() {
     if (gpioInitialise() < 0) return 1;
 
-    int pin = 16; // GPIO
+    int pin = 25; // GPIO
     //1600 90 de grade servo jos stabilizator
     //1450 90 grade servo sus stabilizator
     //front este gps
@@ -17,6 +19,8 @@ int main() {
     //1100-2100
 
     int pulse;
+    //std::cout << "enter pin"<<'\n';
+    //std::cin >> pin;
 
     while (true) {
         std::cout << "Enter pulse width in microseconds (1000-2000, 0 to quit): ";
@@ -24,6 +28,9 @@ int main() {
 
 
         gpioServo(pin, pulse);             // send pulse
+        //gpioServo(23, pulse);
+        //gpioServo(24, pulse);
+        //gpioServo(25, pulse);
         std::cout << "Sent " << pulse << " µs to servo.\n";
     }
 

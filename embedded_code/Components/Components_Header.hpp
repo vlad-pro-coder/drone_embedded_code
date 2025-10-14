@@ -4,7 +4,7 @@
 #include "../MathHelpers/MathHelpers.hpp"
 #include "../Drivers/All_drivers_Header.hpp"
 
-IMU_BNO085 imu;
+using namespace std;
 
 class DroneChassis
 {

@@ -7,6 +7,7 @@ from adafruit_bno08x import (
     BNO_REPORT_ROTATION_VECTOR,
 )
 from adafruit_bno08x.i2c import BNO08X_I2C
+from scipy.spatial.transform import Rotation as R
 
 def quaternion_to_euler(w, x, y, z):
     """Convert quaternion (w, x, y, z) to Euler angles in degrees."""
@@ -150,11 +151,23 @@ class SmoothedBNO08x:
 # ---- Example usage ----
 if __name__ == "__main__":
     i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
-    imu = SmoothedBNO08x(i2c, use_game_vector=True, interval_us=20000, alpha=0.3, spike_threshold=0.2)
+    imu = BNO08X_I2C(i2c, address=0x4a)
+
+    imu.enable_feature(BNO_REPORT_GAME_ROTATION_VECTOR)
 
     while True:
         time.sleep(0.05)
-        euler = imu.get_euler()
-        if euler:
-            yaw, pitch, roll = euler
-            print(f"Yaw: {yaw:.2f}°, Pitch: {pitch:.2f}°, Roll: {roll:.2f}°")
+        raw_q = []
+        try:
+            raw_q = imu.game_quaternion
+        except Exception as e:
+            print("error packet")
+            continue
+
+        x, y, z, w = raw_q
+        r = R.from_quat([x, y, z, w])
+
+        euler = r.as_euler('xyz', degrees=True)
+        roll, pitch, yaw = euler
+
+        print(f"Roll: {roll:.2f}, Pitch: {pitch:.2f}, Yaw: {yaw:.2f}")

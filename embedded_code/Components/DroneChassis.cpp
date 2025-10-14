@@ -14,7 +14,7 @@ DroneChassis::DroneChassis() : HeightCoefs(1.0, 0.0, 0.0), // example P/I/D valu
 void DroneChassis::drive(double outHeight, double outYaw, double outPitch, double outRoll)
 {
     // Diminuator: normalize so all are within [-1, 1]
-    double d = max(abs(outHeight) + abs(outYaw) + abs(outPitch) + abs(outRoll), 1);
+    double d = max(abs(outHeight) + abs(outYaw) + abs(outPitch) + abs(outRoll), 1.0);
 
     double m1power = (outHeight + outPitch - outRoll - outYaw) / d; // M1
     double m2power = (outHeight + outPitch + outRoll + outYaw) / d; // M2

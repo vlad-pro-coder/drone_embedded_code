@@ -45,7 +45,6 @@ double PIDController::calculatePower(double currentPosition, double d)
         D = (error - lastError) / et->seconds();
     Isum += error * dtime;
     double r = pidCoefficients.p * P + pidCoefficients.d * D;
-    //        double r = pidCoefficients.p * P + pidCoefficients.d * D;
 
     if (abs(r) >= maxActuatorOutput && error * r > 0)
     {
