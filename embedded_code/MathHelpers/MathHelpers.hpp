@@ -1,11 +1,7 @@
 #ifndef MATHHELPERS_H
 #define MATHHELPERS_H
 
-#include <chrono>
-#include <memory>
-#include <cmath>
-
-using namespace std;
+#include "../IncludesHeader.hpp"
 
 template<typename T>
 constexpr int signum(T value) {

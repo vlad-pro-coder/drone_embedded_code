@@ -8,5 +8,6 @@ setup(
         "VL53L1XSensor.pyx",
         "RaspGSCamera.pyx",
         "PythonRelatedInitialization.pyx",
+        "ClientPhotoSender.pyx",
     ], compiler_directives={'language_level': "3"})
 )

@@ -1,17 +1,20 @@
 #ifndef ALL_DRIVERS_H
 #define ALL_DRIVERS_H
 
-#include <pigpio.h>
-#include <iostream>
-#include <unistd.h> 
-
-using namespace std;
+#include "../IncludesHeader.hpp"
 
 struct GPS_Data
 {
     int message;
     double lat;
     double lon;
+};
+
+class DriversInitializer
+{
+    public:
+        static void initialize();
+        static void CleanUp();
 };
 
 class Servo
@@ -44,8 +47,8 @@ public:
     void EnableMotor();
 
 private:
-    const int minPulseWidthPWM = 1100;
-    const int maxPulseWidthPWM = 2100;
+    const int minPulseWidthPWM = 750;
+    const int maxPulseWidthPWM = 2300;
     const int minPulseWidthOneShot = 125;
     const int maxPulseWidthOneShot = 250;
     int currentUsedPulseMin = minPulseWidthPWM;
@@ -53,8 +56,31 @@ private:
     const double minPower = 0.0;
     const double maxPower = 1.0;
     bool isDisabled = false;
-    double currPower = 0;
+    double currPower = -1;
     int motorPin = 0;
 };
+
+class Bno085Wraper {
+public:
+    Bno085Wraper();
+    ~Bno085Wraper();
+    tuple<double, double, double> getAngles();
+
+private:
+    struct imu_dependencies;          // forward declaration
+    imu_dependencies* imu_depend;     // raw pointer instead of unique_ptr
+};
+
+class VL53L1XSensorWraper {
+public:
+    VL53L1XSensorWraper();
+    ~VL53L1XSensorWraper();
+    double getDistance();
+
+private:
+    struct sensor_dependencies;          // forward declaration
+    sensor_dependencies* sensor_depend;     // raw pointer instead of unique_ptr
+};
+
 
 #endif

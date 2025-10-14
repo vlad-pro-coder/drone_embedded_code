@@ -1,10 +1,12 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include "../IncludesHeader.hpp"
 #include "../MathHelpers/MathHelpers.hpp"
 #include "../Drivers/All_drivers_Header.hpp"
 
-using namespace std;
+extern Bno085Wraper imu;
+extern VL53L1XSensorWraper sensor;
 
 class DroneChassis
 {
@@ -26,13 +28,21 @@ public:
     PIDCoefficients PitchCoefs;
     PIDCoefficients RollCoefs;
 
-private:
+//private:
+    double toRadians(double degrees);
+    double getAngleDifference(double target, double current);
+    double normalizeToMinusPiToPi(double angle);
+    double TargetYaw = 0;
+    double TargetPitch = 0;
+    double TargetRoll = 0;
+    double TargetHeight = 0;
+
     PIDController HeightPID;
     PIDController YawPID;
     PIDController PitchPID;
     PIDController RollPID;
 
-    Motor m1,m2,m3,m4;
+    Motor fr,fl,br,bl;
 };
 
 

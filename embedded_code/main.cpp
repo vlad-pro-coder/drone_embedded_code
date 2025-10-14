@@ -1,43 +1,74 @@
-#include <iostream>
-#include <pybind11/embed.h>
-
+#include "./IncludesHeader.hpp"
+#include "./Drivers/All_drivers_Header.hpp"
+#include "./MathHelpers/MathHelpers.hpp"
+#include "./Components/Components_Header.hpp"
+#include <pybind11/embed.h> 
 namespace py = pybind11;
-using namespace std;
+
+atomic<char> pidc{'x'};
+atomic<double> coefp{0}, coefi{0}, coefd{0};
+atomic<bool> started{false};
+atomic<bool> running{true};
+
+void inputThread() {
+    while(running.load()) {
+        char code;
+        double a,b,c;
+        if(cin >> code) {
+            if(code == 's') {
+                started.store(true);  // start signal
+                cout << "Starting main loop...\n";
+            }
+            else if(code == 'c') {
+                running.store(false); // stop everything
+            }
+            else if(cin >> a >> b >> c) { // PID update
+                pidc.store(code);
+                coefp.store(a);
+                coefi.store(b);
+                coefd.store(c);
+            }
+        }
+    }
+}
+
+py::scoped_interpreter guard{};  // start Python interpreter
+
+Bno085Wraper imu;
+VL53L1XSensorWraper sensor;
 
 int main() {
-    py::scoped_interpreter guard{};  // start Python interpreter
+    
+    thread t_input(inputThread);
+    DriversInitializer::initialize();
+    DroneChassis drone;
+
+    while(!started.load() && running.load()) {
+        this_thread::sleep_for(10ms);
+    }
 
     try {
-        // Add Python module path
-        auto sys = py::module::import("sys");
-        sys.attr("path").attr("insert")(0, "../pythonTest/env/lib/python3.11/site-packages");
-        sys.attr("path").attr("append")("../pythonTest/build/lib.linux-aarch64-cpython-311");
 
-        // Import Python modules
-        auto pyInitMod = py::module::import("PythonRelatedInitialization");
-        auto sensorMod = py::module::import("VL53L1XSensor");
-
-        // Initialize I2C
-        //auto pyInitializer = pyInitMod.attr("PythonRelatedInitializer");
-        //pyInitializer.attr("initialize")();  // static method
-        //auto i2c_bus = pyInitializer.attr("i2c");
-
-        // Access the sensor class
-        auto sensor = sensorMod.attr("VL53L1XSensor")();
-
-        // Read distance 100 times
-        while(true) {
-            double dist = sensor.attr("get_distance")().cast<double>();
-            cout << dist << " mm\n";
+        while(running.load()){
+            char code = pidc.load();
+            if(code == 'y')
+                drone.YawPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
+            else if(code == 'p')
+                drone.PitchPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
+            else if(code == 'r')
+                drone.RollPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
+            else if(code == 'c')
+                break;
+            drone.update();
         }
 
-
-        // Close sensor
-        sensor.attr("close")();
+        t_input.join();
 
     } catch (const py::error_already_set &e) {
         cerr << "Python error: " << e.what() << endl;
     }
+
+    DriversInitializer::CleanUp();
 
     return 0;
 }

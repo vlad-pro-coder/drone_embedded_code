@@ -9,7 +9,7 @@ K = data["K"]  # 3x3 camera matrix
 D = data["D"]  # distortion coefficients
 picam2 = Picamera2()
 config = picam2.create_still_configuration(
-            main={"size": (416, 416), "format": "BGR888"}
+            main={"size": (1456,1088), "format": "BGR888"}
         )
 config["controls"] = {
             "NoiseReductionMode": 2,  # 2 = High quality
@@ -17,7 +17,6 @@ config["controls"] = {
             "AeEnable": True,
             "Sharpness": 1.0,
             "Contrast": 1.0,
-            "ExposureValue": -0.3,
         }
 
 picam2.configure(config)
@@ -39,7 +38,7 @@ x, y, w_roi, h_roi = roi
 undistorted_cropped = undistorted[y:y+h_roi, x:x+w_roi]
 
 # Save the image
-cv2.imwrite("frame_rgb.jpg", undistorted)
+cv2.imwrite("frame_rgb.jpg", frame_rgb)
 print("Saved frame_rgb.jpg (resized with interpolation)")
 
 # Stop the camera

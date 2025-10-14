@@ -12,7 +12,7 @@ PYBIND11_INC := $(shell $(PYTHON_VENV) -m pybind11 --includes)
 PYTHON_INCLUDES := $(shell python3-config --includes)  # system Python headers
 OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
 
-INCLUDES := $(PYBIND11_INC) $(PYTHON_INCLUDES) $(OPENCV_CFLAGS)
+INCLUDES := $(PYBIND11_INC) $(PYTHON_INCLUDES) #$(OPENCV_CFLAGS)
 
 # Link libraries
 PYTHON_LIBS := $(shell python3-config --ldflags) -lpython3.11
@@ -28,7 +28,7 @@ CXXFLAGS := -Wall -Wextra -std=c++17
 all: $(TARGET)
 
 $(TARGET): $(SRCS)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(SRCS) $(PYTHON_LIBS) $(OPENCV_LIBS) $(EXTRA_LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(SRCS) $(PYTHON_LIBS) $(EXTRA_LIBS) 
 
 clean:
 	rm -f $(TARGET)

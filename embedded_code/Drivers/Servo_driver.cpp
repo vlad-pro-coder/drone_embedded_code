@@ -2,11 +2,6 @@
 
 Servo::Servo(int pin){
     this->servoPin = pin;
-    /*if (gpioInitialise() < 0) {
-        std::cerr << "Pigpio initialization failed!" << std::endl;
-        return 1;
-    }*/
-   //gpioTerminate()
     setPosition(90);
 }
 

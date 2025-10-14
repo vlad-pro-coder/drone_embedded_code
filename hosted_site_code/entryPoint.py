@@ -1,4 +1,4 @@
-from flask import Flask, Response, render_template_string, redirect, url_for
+from flask import Flask, Response, render_template_string, redirect, url_for, jsonify
 from picamera2 import Picamera2
 import sys
 sys.path.append("../pythonTest")
@@ -8,10 +8,14 @@ import os
 from RaspGSCamera import RaspGSCamera
 import time
 from Yolov4Trash import Yolov4TrashDetector
+from ClientPhotoSender import ClientPhotoSender
+from threading import Thread
 
 app = Flask(__name__)
-camera = RaspGSCamera()
 YoloTrashDetector = Yolov4TrashDetector()
+ClientProcessImages = ClientPhotoSender()
+client_thread = False
+client_running = False
 
 # Directory to save calibration images
 CALIB_DIR = "calib_images"
@@ -39,6 +43,12 @@ def gen_frames():
 
 @app.route('/video_feed')
 def video_feed():
+    global client_running
+
+    if client_running:
+        client_thread.stop()
+        client_running = False
+
     return Response(gen_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -96,23 +106,23 @@ def draw_boxes(image, boxes):
 
 @app.route('/detection_test')
 def detect_frame():
-    def gen_frames():
-        while True:
-            # Capture image from camera
-            frame = camera.capture_mat()
-            # Get predictions
-            drawn_img = YoloTrashDetector.visualize_detections(frame)
-            drawn_img = cv2.cvtColor(drawn_img,cv2.COLOR_BGR2RGB)
-            # Encode as JPEG
-            ret, buffer = cv2.imencode('.jpg', drawn_img)
-            if not ret:
-                continue  # skip this frame
-            # Yield frame in streaming format
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+    global client_thread, client_running
 
-    return Response(gen_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    if not client_running:
+        def run_client():
+            global client_running
+            client_running = True
+            try:
+                ClientProcessImages.start_sending_packets()
+            finally:
+                client_running = False
+
+        client_thread = Thread(target=run_client, daemon=True)
+        client_thread.start()
+        return "Client started. <a href='/'>Go back</a>"
+
+    return jsonify({"results": ClientProcessImages.result})
+    
 
 if __name__ == "__main__":
     app.run(host='192.168.2.2', port=8000)

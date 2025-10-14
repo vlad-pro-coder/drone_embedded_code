@@ -7,16 +7,17 @@
 int main() {
     if (gpioInitialise() < 0) return 1;
 
-    int pin = 25; // GPIO
+    int pin = 22; // GPIO
     //1600 90 de grade servo jos stabilizator
     //1450 90 grade servo sus stabilizator
-    //front este gps
-    //pin 22 front left
+    //front este invers gps
+    //pin 22 back left
     //pin 23 front right
     //pin 24 back right
-    //pin 25 back left
+    //pin 25 front left
+    //
 
-    //1100-2100
+    //750-2300
 
     int pulse;
     //std::cout << "enter pin"<<'\n';

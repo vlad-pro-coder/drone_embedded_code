@@ -2,18 +2,14 @@
 
 Motor::Motor(int pin){
     this->motorPin = pin;
-    /*if (gpioInitialise() < 0) {
-        std::cerr << "Pigpio initialization failed!" << std::endl;
-        return 1;
-    }*/
-   //gpioTerminate()
     setPower(0);
 }
 
 void Motor::setPower(double power){
+    power = min(this->maxPower,max(this->minPower,power));
     if(power == this->currPower || this->isDisabled)
         return ;
-    this->currPower = min(this->maxPower,max(this->minPower,power));
+    this->currPower = power;
     int currentPulse = static_cast<int>(this->currentUsedPulseMin + (this->currPower - this->minPower) * (this->currentUsedPulseMax - this->currentUsedPulseMin) / (this->maxPower - this->minPower));
     gpioServo(this->motorPin,currentPulse);
 }

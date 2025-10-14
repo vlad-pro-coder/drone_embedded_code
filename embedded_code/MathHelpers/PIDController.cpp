@@ -33,7 +33,7 @@ double PIDController::calculatePower(double currentPosition, double d)
 {
     if (time->seconds() < 1.0 / freq)
         return lastReturn;
-    time.reset();
+    time->reset();
     error = targetPosition - currentPosition;
     double dtime = et->seconds();
 
@@ -56,7 +56,7 @@ double PIDController::calculatePower(double currentPosition, double d)
 
     r += pidCoefficients.i * Isum;
 
-    et.reset();
+    et->reset();
 
     lastError = error;
     lastReturn = r - kS * signum(error);
