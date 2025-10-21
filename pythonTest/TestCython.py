@@ -5,7 +5,7 @@ import time
 from PythonRelatedInitialization import PythonRelatedInitializer
 
 PythonRelatedInitializer.initialize()
-imu = SmoothBno085.SmoothedBNO08x(PythonRelatedInitializer.i2c,RefreshFrequency = 1000)
+imu = SmoothBno085.SmoothedBNO08x(PythonRelatedInitializer.i2c,RefreshFrequency = 100)
 
 #distance_sensor = VL53L1XSensor.VL53L1XSensor()
 
@@ -14,7 +14,14 @@ while True:
     #    print(f"{distance_sensor.get_distance()}")
     #except Exception:
     #    distance_sensor.close()
-    euler = imu.get_euler()
-    if euler:
+    vel = imu.getVelocity()
+    euler = imu.getAngle()
+    if euler and vel:
         yaw, pitch, roll = euler
-        #print(f"Yaw: {yaw:.2f}°, Pitch: {pitch:.2f}°, Roll: {roll:.2f}°")
+        yawvel, pitchvel, rollvel = vel
+        print(f"Yaw vel: {yawvel:.2f}°, Pitch vel: {pitchvel:.2f}°, Roll vel: {rollvel:.2f}°")
+        print(f"Yaw: {yaw:.2f}°, Pitch: {pitch:.2f}°, Roll: {roll:.2f}°")
+        time.sleep(0.01)
+
+    imu.update()
+

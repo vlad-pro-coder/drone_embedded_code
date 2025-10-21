@@ -8,7 +8,7 @@ DroneChassis::DroneChassis() : HeightCoefs(0.0, 0.0, 0.0), // example P/I/D valu
                                YawPID(YawCoefs),
                                PitchPID(PitchCoefs),
                                RollPID(RollCoefs),
-                               fr(23), fl(25), br(24), bl(22)
+                               fr(23,make_pair(1080,2000)), fl(25,make_pair(1080,2000)), br(24,make_pair(1080,2000)), bl(22,make_pair(1080,2000))
 {
 
     YawPID.setTargetPosition(0);
@@ -16,10 +16,10 @@ DroneChassis::DroneChassis() : HeightCoefs(0.0, 0.0, 0.0), // example P/I/D valu
     PitchPID.setTargetPosition(0);
     HeightPID.setTargetPosition(0);
 
-    fr.setPower(0);
-    fl.setPower(0);
-    bl.setPower(0);
-    br.setPower(0);
+    fr.setPowerSmooth(0);
+    fl.setPowerSmooth(0);
+    bl.setPowerSmooth(0);
+    br.setPowerSmooth(0);
 
 }
 
@@ -33,10 +33,10 @@ void DroneChassis::drive(double outHeight, double outYaw, double outPitch, doubl
     double brpower = (outHeight - outPitch - outRoll + outYaw) / d;
     double blpower = (outHeight - outPitch + outRoll - outYaw) / d;
 
-    fr.setPower(frpower);
-    fl.setPower(flpower);
-    br.setPower(brpower);
-    bl.setPower(blpower);
+    fr.setPowerSmooth(frpower);
+    fl.setPowerSmooth(flpower);
+    br.setPowerSmooth(brpower);
+    bl.setPowerSmooth(blpower);
 
     cout << "\033[s\033[2;1H\033[K";
 
@@ -92,6 +92,11 @@ void DroneChassis::update()
             cout << "\033[u" << flush;
 
     drive(outHeight, outYaw, outPitch, outRoll);
+
+    fr.update();
+    fl.update();
+    br.update();
+    bl.update();
 }
 
 void DroneChassis::setYaw(double rads)

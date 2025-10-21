@@ -7,13 +7,11 @@ import numpy as np
 import os
 from RaspGSCamera import RaspGSCamera
 import time
-from Yolov4Trash import Yolov4TrashDetector
 from ClientPhotoSender import ClientPhotoSender
 from threading import Thread
 
 app = Flask(__name__)
-YoloTrashDetector = Yolov4TrashDetector()
-ClientProcessImages = ClientPhotoSender()
+ClientProcessImages = ClientPhotoSender("192.168.1.10")
 client_thread = False
 client_running = False
 
@@ -23,7 +21,7 @@ os.makedirs(CALIB_DIR, exist_ok=True)
 
 # Chessboard parameters
 CHESSBOARD_SIZE = (9, 6)
-SQUARE_SIZE = 1.0  # arbitrary units
+SQUARE_SIZE = 2.0  # arbitrary units
 
 # HTML template for calibration page
 CALIB_TEMPLATE = """
@@ -37,7 +35,7 @@ CALIB_TEMPLATE = """
 
 def gen_frames():
     while True:
-        frame_bytes = camera.capture_jpeg()
+        frame_bytes = ClientProcessImages.camera.capture_jpeg()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
@@ -62,7 +60,7 @@ def start_calibration():
     time.sleep(2)
     captured_files = []
     for i in range(45):
-        frame = camera.capture_mat()  # get as NumPy array
+        frame = ClientProcessImages.camera.capture_mat()  # get as NumPy array
         filename = os.path.join(CALIB_DIR, f"calib_{i:02d}.jpg")
         cv2.imwrite(filename, frame)
         captured_files.append(filename)
@@ -125,4 +123,4 @@ def detect_frame():
     
 
 if __name__ == "__main__":
-    app.run(host='192.168.2.2', port=8000)
+    app.run(host='0.0.0.0', port=8000)

@@ -17,7 +17,7 @@ cdef class RaspGSCamera:
     cdef int height
     cdef bint started
 
-    def __cinit__(self, int width=1456, int height=1088, const char* calib_file = b"camera_calibration.npz"):
+    def __cinit__(self, int width=1456, int height=1088, const char* calib_file = b"../hosted_site_code/camera_calibration.npz"):
         # Minimal work here, real init in __init__ (to allow Python exceptions)
         self.width = width
         self.height = height
@@ -29,7 +29,7 @@ cdef class RaspGSCamera:
         self.map2 = None
         self.roi = (0, 0, width, height)
 
-    def __init__(self, int width=1456, int height=1088, calib_file="camera_calibration.npz"):
+    def __init__(self, int width=1456, int height=1088, calib_file="../hosted_site_code/camera_calibration.npz"):
         # Keep Python-level initialization here (can raise)
         if not os.path.exists(calib_file):
             raise FileNotFoundError(f"Calibration file not found: {calib_file}")
@@ -43,11 +43,12 @@ cdef class RaspGSCamera:
             main={"size": (width, height), "format": "BGR888"}
         )
         config["controls"] = {
-            "NoiseReductionMode": 2,
-            "AwbEnable": True,
-            "AeEnable": True,
-            "Sharpness": 1.0,
-            "Contrast": 1.0,
+            # Turn off automatic noise reduction (NR can blur details)
+            "NoiseReductionMode": 0,  
+
+            # Lock or tune auto settings carefully
+            "AwbEnable": True,      # Auto white balance
+            "AeEnable": True,       # Auto exposure
         }
         self.picam2.configure(config)
         self.picam2.start()

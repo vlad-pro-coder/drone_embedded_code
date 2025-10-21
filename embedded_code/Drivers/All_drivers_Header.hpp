@@ -2,6 +2,7 @@
 #define ALL_DRIVERS_H
 
 #include "../IncludesHeader.hpp"
+#include "../MathHelpers/MathHelpers.hpp"
 
 struct GPS_Data
 {
@@ -38,24 +39,34 @@ private:
 class Motor
 {
 public:
-    Motor(int pin);
+    Motor(int pin,pair<int,int>pwm);
     ~Motor();
 
     // Get latest orientation; respects frequency limit
-    void setPower(double power);
+    void setPowerSmooth(double power);
+    void update();
     void DisableMotor();
     void EnableMotor();
+    void setPower(double power);
+    void setPWMinterval(pair<int,int> pwm);
 
 private:
-    const int minPulseWidthPWM = 750;
-    const int maxPulseWidthPWM = 2300;
-    const int minPulseWidthOneShot = 125;
-    const int maxPulseWidthOneShot = 250;
+    double startPower;
+    double targetPower;
+    double rampDuration;
+    Timer rampTimer;
+    double fullThrottleTime = 1.0;
+    
+    int minPulseWidthPWM = 750;
+    int maxPulseWidthPWM = 2300;
+    int minPulseWidthOneShot = 125;
+    int maxPulseWidthOneShot = 250;
     int currentUsedPulseMin = minPulseWidthPWM;
     int currentUsedPulseMax = maxPulseWidthPWM;
     const double minPower = 0.0;
     const double maxPower = 1.0;
     bool isDisabled = false;
+    bool isRamping = false;
     double currPower = -1;
     int motorPin = 0;
 };

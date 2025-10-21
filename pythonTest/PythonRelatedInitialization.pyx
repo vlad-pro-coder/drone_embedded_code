@@ -7,5 +7,5 @@ class PythonRelatedInitializer:
     @staticmethod
     def initialize():
         # Initialize I2C bus and store in static variable
-        PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA)
+        PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA,frequency=400000)
 

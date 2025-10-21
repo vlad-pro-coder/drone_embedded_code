@@ -7,12 +7,13 @@ from types import SimpleNamespace
 from RaspGSCamera import RaspGSCamera
 
 class ClientPhotoSender():
-    def __init__(self):
+    def __init__(self,IP):
         self.camera = RaspGSCamera()
         self.HEADER_FMT = "!I"
         focal_x , focal_y, cx, cy = self.camera.getIntrinsics()
         self.intrinsics = np.array([focal_x, focal_y, cx, cy], dtype=np.float32)
         self.result = []
+        self.IP = IP
 
     def __pack_message(self,data_bytes: bytes) -> bytes:
         return struct.pack(self.HEADER_FMT, len(data_bytes)) + data_bytes
@@ -35,7 +36,7 @@ class ClientPhotoSender():
 
     def start_sending_packets(self):
         args = SimpleNamespace(
-            host="192.168.2.1",#to do: wireless connection
+            host=self.IP,#to do: wireless connection
             port=5001,
         )
 
