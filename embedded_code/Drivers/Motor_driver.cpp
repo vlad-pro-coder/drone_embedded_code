@@ -12,7 +12,6 @@ void Motor::setPower(double power){
         return ;
     this->currPower = power;
     int currentPulse = static_cast<int>(this->currentUsedPulseMin + (this->currPower - this->minPower) * (this->currentUsedPulseMax - this->currentUsedPulseMin) / (this->maxPower - this->minPower));
-    cout<<currentPulse<<'\n';
     gpioServo(this->motorPin,currentPulse);
 }
 

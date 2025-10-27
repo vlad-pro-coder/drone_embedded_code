@@ -55,7 +55,7 @@ private:
     double targetPower;
     double rampDuration;
     Timer rampTimer;
-    double fullThrottleTime = 1.0;
+    double fullThrottleTime = 0.03;
     
     int minPulseWidthPWM = 750;
     int maxPulseWidthPWM = 2300;
@@ -76,7 +76,8 @@ public:
     Bno085Wraper();
     ~Bno085Wraper();
     tuple<double, double, double> getAngles();
-
+    tuple<double, double, double> getVelocity();
+    void update();
 private:
     struct imu_dependencies;          // forward declaration
     imu_dependencies* imu_depend;     // raw pointer instead of unique_ptr

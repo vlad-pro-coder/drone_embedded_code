@@ -7,7 +7,7 @@
 int main() {
     if (gpioInitialise() < 0) return 1;
 
-    int pin = 9; // GPIO
+    int pin = 23; // GPIO
     //1600 90 de grade servo jos stabilizator
     //1450 90 grade servo sus stabilizator
     //front este invers gps
@@ -17,7 +17,7 @@ int main() {
     //pin 25 front left
     //24 -> 9
 
-    //22 pulse 1080 la 2000
+    //22 pulse 1090 la 2000
     //23 pulse 1080 la 2000
     //25 pulse 910 - 2200
     //9 pulse 750 la 2300

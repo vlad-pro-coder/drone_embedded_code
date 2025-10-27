@@ -43,6 +43,7 @@ public:
     PIDController RollPID;
 
     Motor fr,fl,br,bl;
+    double default_power = 0;
 };
 
 

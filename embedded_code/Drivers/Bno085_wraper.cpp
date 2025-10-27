@@ -22,19 +22,32 @@ Bno085Wraper::Bno085Wraper() {
 
     this->imu_depend->i2c_bus = pyInitializer.attr("i2c");
     this->imu_depend->imu = imuMod.attr("SmoothedBNO08x")(
-        this->imu_depend->i2c_bus,
-        py::arg("RefreshFrequency") = 1000
+        this->imu_depend->i2c_bus
     );
 }
 
 tuple<double,double,double> Bno085Wraper::getAngles() {
-    auto euler = this->imu_depend->imu.attr("get_euler")();
+    auto euler = this->imu_depend->imu.attr("getAngle")();
     py::tuple euler_tuple = euler.cast<py::tuple>();
     return make_tuple(
         euler_tuple[0].cast<double>(),
         euler_tuple[1].cast<double>(),
         euler_tuple[2].cast<double>()
     );
+}
+
+tuple<double,double,double> Bno085Wraper::getVelocity() {
+    auto velocities = this->imu_depend->imu.attr("getVelocity")();
+    py::tuple velocities_tuple = velocities.cast<py::tuple>();
+    return make_tuple(
+        velocities_tuple[0].cast<double>(),
+        velocities_tuple[1].cast<double>(),
+        velocities_tuple[2].cast<double>()
+    );
+}
+
+void Bno085Wraper::update(){
+    this->imu_depend->imu.attr("update")();
 }
 
 // Optional: destructor to free memory

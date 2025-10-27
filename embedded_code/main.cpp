@@ -16,7 +16,7 @@ atomic<double> power{0.0};
 void inputThread() {
     while(running.load()) {
         char code;
-        cin>>code;
+        /*cin>>code;
         if(code == 'p')
             {
                 double p;
@@ -25,8 +25,8 @@ void inputThread() {
                 power.store(p);
             }
         else if(code == 'c')
-            running.store(false);
-        /*double a,b,c;
+            running.store(false);*/
+        double a,b,c;
         if(cin >> code) {
             if(code == 's') {
                 started.store(true);  // start signal
@@ -35,13 +35,20 @@ void inputThread() {
             else if(code == 'c') {
                 running.store(false); // stop everything
             }
+            else if(code == 'd')
+                {
+                    double p;
+                    cin>>p;
+                    power.store(p);
+                    pidc.store(code);
+                }
             else if(cin >> a >> b >> c) { // PID update
                 pidc.store(code);
                 coefp.store(a);
                 coefi.store(b);
                 coefd.store(c);
             }
-        }*/
+        }
     }
 }
 
@@ -53,17 +60,12 @@ VL53L1XSensorWraper sensor;
 int main() {
     DriversInitializer::initialize();
     thread t_input(inputThread);
-    /*DroneChassis drone;
+    DroneChassis drone;
 
     while(!started.load() && running.load()) {
         this_thread::sleep_for(10ms);
-    }*/
-    Motor m1(22,make_pair(1080,2000)),m2(23,make_pair(1080,2000)),m3(9,make_pair(750,2300)),m4(25,make_pair(900,2200));
-
-    //22 pulse 1080 la 2000
-    //23 pulse 1080 la 2000
-    //25 pulse 910 - 2200
-    //9 pulse 750 la 2300
+    }
+    //Motor m1(22,make_pair(1090,2000)),m2(23,make_pair(1090,2000)),m3(9,make_pair(750,2300)),m4(25,make_pair(900,2200));
 
     /*Scheduler scheduler;
     scheduler
@@ -91,7 +93,7 @@ int main() {
 
         pyClient.attr("start_sending_packets")();*/
         
-        /*while(running.load()){
+        while(running.load()){
             char code = pidc.load();
             if(code == 'y')
                 drone.YawPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
@@ -99,14 +101,17 @@ int main() {
                 drone.PitchPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
             else if(code == 'r')
                 drone.RollPID.setPidCoefficients(PIDCoefficients(coefp.load(),coefi.load(),coefd.load()));
+            else if(code == 'd')
+                drone.default_power = power.load();
             else if(code == 'c')
                 break;
             drone.update();
+            imu.update();
         }
 
-        t_input.join();*/
+        t_input.join();
 
-        while(running.load()){
+        /*while(running.load()){
             if(started.load())
             {
                 m1.setPowerSmooth(power.load());
@@ -119,7 +124,7 @@ int main() {
             m2.update();
             m3.update();
             m4.update();
-        }
+        }*/
 
         /*while(!scheduler.isSchedulerDone())
         {

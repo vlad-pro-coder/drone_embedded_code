@@ -1,20 +1,25 @@
 #include "./Components_Header.hpp"
-
+//o 0.12 0.005 0
 DroneChassis::DroneChassis() : HeightCoefs(0.0, 0.0, 0.0), // example P/I/D values
-                               YawCoefs(0.2, 0.0, 0.0),
-                               PitchCoefs(0.4, 0.0, 0.0),
-                               RollCoefs(0.4, 0.0, 0.0),
+                               YawCoefs(0.0, 0.0, 0.0),
+                               PitchCoefs(0.0, 0.0, 0.0),
+                               RollCoefs(0.0, 0.0, 0.0),
                                HeightPID(HeightCoefs),
                                YawPID(YawCoefs),
                                PitchPID(PitchCoefs),
                                RollPID(RollCoefs),
-                               fr(23,make_pair(1080,2000)), fl(25,make_pair(1080,2000)), br(24,make_pair(1080,2000)), bl(22,make_pair(1080,2000))
+                               fr(23,make_pair(1080,2000)), fl(25,make_pair(900,2200)), br(9,make_pair(750,2300)), bl(22,make_pair(1080,2000))
 {
 
     YawPID.setTargetPosition(0);
     RollPID.setTargetPosition(0);
     PitchPID.setTargetPosition(0);
     HeightPID.setTargetPosition(0);
+
+    YawPID.setFreq(200);
+    RollPID.setFreq(200);
+    PitchPID.setFreq(200);
+    HeightPID.setFreq(50);
 
     fr.setPowerSmooth(0);
     fl.setPowerSmooth(0);
@@ -28,10 +33,10 @@ void DroneChassis::drive(double outHeight, double outYaw, double outPitch, doubl
     // Diminuator: normalize so all are within [0, 1]
     double d = max(abs(outHeight) + abs(outYaw) + abs(outPitch) + abs(outRoll), 1.0);
 
-    double frpower = (outHeight + outPitch - outRoll - outYaw) / d;
-    double flpower = (outHeight + outPitch + outRoll + outYaw) / d;
-    double brpower = (outHeight - outPitch - outRoll + outYaw) / d;
-    double blpower = (outHeight - outPitch + outRoll - outYaw) / d;
+    double frpower = (this->default_power + outHeight + outPitch - outRoll - outYaw) / d;
+    double flpower = (this->default_power + outHeight + outPitch + outRoll + outYaw) / d;
+    double brpower = (this->default_power + outHeight - outPitch - outRoll + outYaw) / d;
+    double blpower = (this->default_power + outHeight - outPitch + outRoll - outYaw) / d;
 
     fr.setPowerSmooth(frpower);
     fl.setPowerSmooth(flpower);
@@ -58,6 +63,11 @@ void DroneChassis::update()
     double currentPitch = get<1>(results);
     double currentRoll  = get<2>(results);
 
+    results = imu.getVelocity();
+    double currentYawVel   = get<0>(results);
+    double currentPitchVel = get<1>(results);
+    double currentRollVel  = get<2>(results);
+
     double currentHeight = 0;//sensor.attr("get_distance")();
 
     double pitchError = getAngleDifference(this->TargetPitch, toRadians(currentPitch));
@@ -70,16 +80,19 @@ void DroneChassis::update()
     if(normalizedYaw < 0) normalizedYaw += M_PI * 2;
     if(normalizedYaw > 2*M_PI) normalizedYaw -= M_PI * 2;*/
 
-    double cosYaw = cos(toRadians(currentYaw));
-    double sinYaw = sin(toRadians(currentYaw));
+    //double cosYaw = cos(toRadians(currentYaw));
+    //double sinYaw = sin(toRadians(currentYaw));
 
-    double bodyX =  cosYaw * pitchError + sinYaw * rollError;
-    double bodyY =  sinYaw * pitchError - cosYaw * rollError;
+    double bodyX =  pitchError;//cosYaw * pitchError + sinYaw * rollError;
+    double bodyY =  rollError;//sinYaw * pitchError - cosYaw * rollError;
+
+    double bodyXVel =  currentPitchVel;//cosYaw * currentPitchVel + sinYaw * currentRollVel;
+    double bodyYVel =  currentRollVel;//sinYaw * currentPitchVel - cosYaw * currentRollVel;
 
     // Feed PID with errors, target = 0
-    double outPitch = PitchPID.calculatePower(bodyX);
-    double outRoll  = RollPID.calculatePower(bodyY);
-    double outYaw   = YawPID.calculatePower(yawError);
+    double outPitch = PitchPID.calculatePower(bodyX,bodyXVel);
+    double outRoll  = RollPID.calculatePower(bodyY,bodyYVel);
+    double outYaw   = YawPID.calculatePower(yawError,currentYawVel);
     double outHeight = HeightPID.calculatePower(heightError);
 
     cout << "\033[s\033[1;1H\033[K";

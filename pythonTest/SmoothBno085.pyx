@@ -15,7 +15,7 @@ from adafruit_bno08x import BNO_REPORT_GAME_ROTATION_VECTOR, BNO_REPORT_ROTATION
 from adafruit_bno08x.i2c import BNO08X_I2C
 import time
 import sys
-
+import digitalio
 # ------------------------------
 # Helper C functions
 # ------------------------------
@@ -43,10 +43,15 @@ cdef class SmoothedBNO08x:
     cdef double minimumyaw
     cdef double minimumpitch
     cdef double minimumroll
+    cdef object int_pin
+    cdef object reset_pin
 
-    def __init__(self, i2c,double RefreshFrequency, int address=0x4A, bint use_game_vector=True,
-                 int interval_us=20000, double spike_threshold_rotation=30, double spike_threshold_gyro=45):
+    def __init__(self, i2c, int address=0x4A, bint use_game_vector=True,
+                 int interval_us=20000, double spike_threshold_rotation=30, double spike_threshold_gyro=70):
 
+        self.int_pin = digitalio.DigitalInOut(board.D20)
+        self.int_pin.direction = digitalio.Direction.INPUT
+        self.int_pin.pull = digitalio.Pull.UP  # BNO085 pulls it low when ready
         self.use_game_vector = use_game_vector
         self.bno = BNO08X_I2C(i2c, address=address, debug = False)
         self.interval_us = interval_us
@@ -59,12 +64,9 @@ cdef class SmoothedBNO08x:
         self.detectedSpiked_gyro = 0
         self.detectedSpiked_rotation = 0
         #self.maxSpikes = 20
-        self.RefreshFrequency = RefreshFrequency
+        #self.RefreshFrequency = RefreshFrequency
         self.lasttime = 0
         self.TWO_PI = 2.0 * M_PI
-        self.minimumyaw = 1e9;
-        self.minimumpitch = 1e9;
-        self.minimumroll = 1e9;
         #sys.stdout = open("imu_log.txt", "w")
 
         self.__enable_feature()
@@ -96,15 +98,15 @@ cdef class SmoothedBNO08x:
     cpdef __enable_imu(self):
         feature = BNO_REPORT_GAME_ROTATION_VECTOR if self.use_game_vector else BNO_REPORT_ROTATION_VECTOR
         try:
-            self.bno.enable_feature(feature, interval=self.interval_us)
-        except TypeError:
             self.bno.enable_feature(feature)
+        except TypeError:
+            print("no feature")
 
     cpdef __enable_gyro(self):
         try:
-            self.bno.enable_feature(BNO_REPORT_GYROSCOPE, interval=self.interval_us)
-        except TypeError:
             self.bno.enable_feature(BNO_REPORT_GYROSCOPE)
+        except TypeError:
+            print("no feature")
 
     cpdef __enable_feature(self):
         self.__enable_imu()
@@ -129,11 +131,11 @@ cdef class SmoothedBNO08x:
         except Exception as e:
             #print("⚠️ failed quaternion:", e)
             return
-
+#
         roll_vel = math.degrees(py_gyro[0])
         pitch_vel = math.degrees(py_gyro[1])
         yaw_vel = math.degrees(py_gyro[2])
-
+#
         if (self.last_gyro[0] == pitch_vel and self.last_gyro[1] == roll_vel and self.last_gyro[2] == yaw_vel):
             self.freeze_count += 1
             if self.freeze_count >= self.max_freeze:
@@ -196,12 +198,6 @@ cdef class SmoothedBNO08x:
         cdef double pitchdiff = self.__getAngleDifference(pitch,self.last_euler[1])
         cdef double rolldiff = self.__getAngleDifference(roll,self.last_euler[2])
         
-        #self.minimumyaw = min(self.minimumyaw,yaw)
-        #self.minimumpitch = min(self.minimumpitch,pitch)
-        #self.minimumroll = min(self.minimumroll,roll)
-        #print(" min Yaw: ", self.minimumyaw , " min Pitch: ",self.minimumpitch, " min Roll: " ,{self.minimumroll})
-        #print(self.detectedSpiked)
-        #print(" Yaw: ", yaw , " Pitch: ",pitch, " Roll: " ,roll)
         if (self.hasAnchor_rotation and (abs(yawdiff) > self.spike_threshold_rotation or abs(pitchdiff) > self.spike_threshold_rotation or abs(rolldiff) > self.spike_threshold_rotation)): 
             #print("⚠️ Sudden Spike Detected")
             self.detectedSpiked_rotation+=1
@@ -217,14 +213,19 @@ cdef class SmoothedBNO08x:
 
     cpdef void update(self):
         #print(1.0/self.RefreshFrequency > time.time() - self.lasttime)
-        if 1.0/self.RefreshFrequency > time.time() - self.lasttime:
-            #print("no calculation")
+        #if 1.0/self.RefreshFrequency > time.time() - self.lasttime:
+        #    #print("no calculation")
+        #    return
+        if self.int_pin.value:  # still high → no data
             return
 
-        self.lasttime = time.time()
-        self.__filterAngles()
-        self.__filterVelocities()
-
+        try:
+            self.__filterAngles()
+            self.__filterVelocities()
+            #print("freqcuency",1 / (time.time() - self.lasttime))
+            self.lasttime = time.time()
+        except Exception as e:
+            print("⚠️ Read error:", e)
     cpdef tuple getAngle(self):
         return (self.last_euler[0],self.last_euler[1],self.last_euler[2])
     cpdef tuple getVelocity(self):

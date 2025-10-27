@@ -1789,6 +1789,22 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject
 #define __Pyx_PyObject_FastCall(func, args, nargs)  __Pyx_PyObject_FastCallDict(func, args, (size_t)(nargs), NULL)
 static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObject * const*args, size_t nargs, PyObject *kwargs);
 
+/* PyObjectDelAttr.proto */
+#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
+#define __Pyx_PyObject_DelAttr(o, n) PyObject_SetAttr(o, n, NULL)
+#else
+#define __Pyx_PyObject_DelAttr(o, n) PyObject_DelAttr(o, n)
+#endif
+
+/* PyObjectSetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
+#else
+#define __Pyx_PyObject_DelAttrStr(o,n)   __Pyx_PyObject_DelAttr(o,n)
+#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
 /* PyObjectVectorCallKwBuilder.proto */
 CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n);
 #if CYTHON_VECTORCALL
@@ -1805,22 +1821,6 @@ static int __Pyx_VectorcallBuilder_AddArgStr(const char *key, PyObject *value, P
 #define __Pyx_MakeVectorcallBuilderKwds(n) __Pyx_PyDict_NewPresized(n)
 #define __Pyx_VectorcallBuilder_AddArg(key, value, builder, args, n) PyDict_SetItem(builder, key, value)
 #define __Pyx_VectorcallBuilder_AddArgStr(key, value, builder, args, n) PyDict_SetItemString(builder, key, value)
-#endif
-
-/* PyObjectDelAttr.proto */
-#if CYTHON_COMPILING_IN_LIMITED_API && __PYX_LIMITED_VERSION_HEX < 0x030d0000
-#define __Pyx_PyObject_DelAttr(o, n) PyObject_SetAttr(o, n, NULL)
-#else
-#define __Pyx_PyObject_DelAttr(o, n) PyObject_DelAttr(o, n)
-#endif
-
-/* PyObjectSetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
-#else
-#define __Pyx_PyObject_DelAttrStr(o,n)   __Pyx_PyObject_DelAttr(o,n)
-#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
 #endif
 
 /* Import.proto */
@@ -2153,6 +2153,7 @@ int __pyx_module_is_main_PythonRelatedInitialization = 0;
 static PyObject *__pyx_builtin_staticmethod;
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = "?";
+static const char __pyx_k_D21[] = "D21";
 static const char __pyx_k_I2C[] = "I2C";
 static const char __pyx_k_SCL[] = "SCL";
 static const char __pyx_k_SDA[] = "SDA";
@@ -2163,22 +2164,31 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_time[] = "time";
 static const char __pyx_k_board[] = "board";
 static const char __pyx_k_busio[] = "busio";
+static const char __pyx_k_sleep[] = "sleep";
+static const char __pyx_k_value[] = "value";
+static const char __pyx_k_OUTPUT[] = "OUTPUT";
 static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_set_name[] = "__set_name__";
+static const char __pyx_k_Direction[] = "Direction";
+static const char __pyx_k_digitalio[] = "digitalio";
+static const char __pyx_k_direction[] = "direction";
 static const char __pyx_k_frequency[] = "frequency";
 static const char __pyx_k_metaclass[] = "__metaclass__";
+static const char __pyx_k_reset_pin[] = "reset_pin";
 static const char __pyx_k_initialize[] = "initialize";
-static const char __pyx_k_A_uD_fE_jPQ[] = "\200A\360\006\000\t!\240\007\240u\250D\260\001\260\025\260f\270E\300\025\300j\320PQ";
+static const char __pyx_k_DigitalInOut[] = "DigitalInOut";
 static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_staticmethod[] = "staticmethod";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_PythonRelatedInitializer[] = "PythonRelatedInitializer";
+static const char __pyx_k_A_I_5_iz_F_1_F_1_uD_fE_jPQ[] = "\200A\340\010\024\220I\230]\250!\2505\260\001\330\010\021\220\035\230i\240z\260\021\340\010\021\220\031\230!\330\010\014\210F\220!\2201\330\010\021\220\031\230!\330\010\014\210F\220!\2201\330\010 \240\007\240u\250D\260\001\260\025\260f\270E\300\025\300j\320PQ";
 static const char __pyx_k_PythonRelatedInitialization[] = "PythonRelatedInitialization";
 static const char __pyx_k_PythonRelatedInitialization_pyx[] = "PythonRelatedInitialization.pyx";
 static const char __pyx_k_PythonRelatedInitializer_initial[] = "PythonRelatedInitializer.initialize";
@@ -2223,8 +2233,10 @@ typedef struct {
   PyTypeObject *__pyx_CoroutineType;
   #endif
   PyObject *__pyx_codeobj_tab[1];
-  PyObject *__pyx_string_tab[29];
-  PyObject *__pyx_int_400000;
+  PyObject *__pyx_string_tab[39];
+  PyObject *__pyx_float_0_5;
+  PyObject *__pyx_float_0_02;
+  PyObject *__pyx_int_800000;
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -2263,34 +2275,44 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #endif
 /* #### Code section: constant_name_defines ### */
 #define __pyx_kp_u_ __pyx_string_tab[0]
-#define __pyx_n_u_I2C __pyx_string_tab[1]
-#define __pyx_n_u_PythonRelatedInitialization __pyx_string_tab[2]
-#define __pyx_kp_u_PythonRelatedInitialization_pyx __pyx_string_tab[3]
-#define __pyx_n_u_PythonRelatedInitializer __pyx_string_tab[4]
-#define __pyx_n_u_PythonRelatedInitializer_initial __pyx_string_tab[5]
-#define __pyx_n_u_SCL __pyx_string_tab[6]
-#define __pyx_n_u_SDA __pyx_string_tab[7]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[8]
-#define __pyx_n_u_board __pyx_string_tab[9]
-#define __pyx_n_u_busio __pyx_string_tab[10]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[11]
-#define __pyx_n_u_doc __pyx_string_tab[12]
-#define __pyx_n_u_frequency __pyx_string_tab[13]
-#define __pyx_n_u_func __pyx_string_tab[14]
-#define __pyx_n_u_i2c __pyx_string_tab[15]
-#define __pyx_n_u_initialize __pyx_string_tab[16]
-#define __pyx_n_u_initializing __pyx_string_tab[17]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[18]
-#define __pyx_n_u_main __pyx_string_tab[19]
-#define __pyx_n_u_metaclass __pyx_string_tab[20]
-#define __pyx_n_u_module __pyx_string_tab[21]
-#define __pyx_n_u_name __pyx_string_tab[22]
-#define __pyx_n_u_prepare __pyx_string_tab[23]
-#define __pyx_n_u_qualname __pyx_string_tab[24]
-#define __pyx_n_u_set_name __pyx_string_tab[25]
-#define __pyx_n_u_spec __pyx_string_tab[26]
-#define __pyx_n_u_staticmethod __pyx_string_tab[27]
-#define __pyx_n_u_test __pyx_string_tab[28]
+#define __pyx_n_u_D21 __pyx_string_tab[1]
+#define __pyx_n_u_DigitalInOut __pyx_string_tab[2]
+#define __pyx_n_u_Direction __pyx_string_tab[3]
+#define __pyx_n_u_I2C __pyx_string_tab[4]
+#define __pyx_n_u_OUTPUT __pyx_string_tab[5]
+#define __pyx_n_u_PythonRelatedInitialization __pyx_string_tab[6]
+#define __pyx_kp_u_PythonRelatedInitialization_pyx __pyx_string_tab[7]
+#define __pyx_n_u_PythonRelatedInitializer __pyx_string_tab[8]
+#define __pyx_n_u_PythonRelatedInitializer_initial __pyx_string_tab[9]
+#define __pyx_n_u_SCL __pyx_string_tab[10]
+#define __pyx_n_u_SDA __pyx_string_tab[11]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[12]
+#define __pyx_n_u_board __pyx_string_tab[13]
+#define __pyx_n_u_busio __pyx_string_tab[14]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[15]
+#define __pyx_n_u_digitalio __pyx_string_tab[16]
+#define __pyx_n_u_direction __pyx_string_tab[17]
+#define __pyx_n_u_doc __pyx_string_tab[18]
+#define __pyx_n_u_frequency __pyx_string_tab[19]
+#define __pyx_n_u_func __pyx_string_tab[20]
+#define __pyx_n_u_i2c __pyx_string_tab[21]
+#define __pyx_n_u_initialize __pyx_string_tab[22]
+#define __pyx_n_u_initializing __pyx_string_tab[23]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[24]
+#define __pyx_n_u_main __pyx_string_tab[25]
+#define __pyx_n_u_metaclass __pyx_string_tab[26]
+#define __pyx_n_u_module __pyx_string_tab[27]
+#define __pyx_n_u_name __pyx_string_tab[28]
+#define __pyx_n_u_prepare __pyx_string_tab[29]
+#define __pyx_n_u_qualname __pyx_string_tab[30]
+#define __pyx_n_u_reset_pin __pyx_string_tab[31]
+#define __pyx_n_u_set_name __pyx_string_tab[32]
+#define __pyx_n_u_sleep __pyx_string_tab[33]
+#define __pyx_n_u_spec __pyx_string_tab[34]
+#define __pyx_n_u_staticmethod __pyx_string_tab[35]
+#define __pyx_n_u_test __pyx_string_tab[36]
+#define __pyx_n_u_time __pyx_string_tab[37]
+#define __pyx_n_u_value __pyx_string_tab[38]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -2312,8 +2334,10 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   __Pyx_State_RemoveModule(NULL);
   #endif
   for (int i=0; i<1; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<29; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
-  Py_CLEAR(clear_module_state->__pyx_int_400000);
+  for (int i=0; i<39; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  Py_CLEAR(clear_module_state->__pyx_float_0_5);
+  Py_CLEAR(clear_module_state->__pyx_float_0_02);
+  Py_CLEAR(clear_module_state->__pyx_int_800000);
   return 0;
 }
 #endif
@@ -2335,19 +2359,21 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_FusedFunctionType);
   #endif
   for (int i=0; i<1; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<29; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
-  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_400000);
+  for (int i=0; i<39; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_0_5);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_float_0_02);
+  __Pyx_VISIT_CONST(traverse_module_state->__pyx_int_800000);
   return 0;
 }
 #endif
 /* #### Code section: module_code ### */
 
-/* "PythonRelatedInitialization.pyx":7
+/* "PythonRelatedInitialization.pyx":6
  *     i2c = None
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def initialize():
- *         # Initialize I2C bus and store in static variable
+ *         reset_pin = digitalio.DigitalInOut(board.D21)
 */
 
 /* Python wrapper */
@@ -2367,6 +2393,7 @@ static PyObject *__pyx_pw_27PythonRelatedInitialization_24PythonRelatedInitializ
 }
 
 static PyObject *__pyx_pf_27PythonRelatedInitialization_24PythonRelatedInitializer_initialize(CYTHON_UNUSED PyObject *__pyx_self) {
+  PyObject *__pyx_v_reset_pin = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2374,36 +2401,32 @@ static PyObject *__pyx_pf_27PythonRelatedInitialization_24PythonRelatedInitializ
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  size_t __pyx_t_7;
+  size_t __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("initialize", 0);
 
-  /* "PythonRelatedInitialization.pyx":10
+  /* "PythonRelatedInitialization.pyx":8
+ *     @staticmethod
  *     def initialize():
+ *         reset_pin = digitalio.DigitalInOut(board.D21)             # <<<<<<<<<<<<<<
+ *         reset_pin.direction = digitalio.Direction.OUTPUT
  *         # Initialize I2C bus and store in static variable
- *         PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA,frequency=400000)             # <<<<<<<<<<<<<<
- * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_busio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_digitalio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_I2C); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_DigitalInOut); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_board); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_board); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_SCL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_D21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_board); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_SDA); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 10, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_7 = 1;
+  __pyx_t_6 = 1;
   #if CYTHON_UNPACK_METHODS
   if (unlikely(PyMethod_Check(__pyx_t_4))) {
     __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
@@ -2412,35 +2435,187 @@ static PyObject *__pyx_pf_27PythonRelatedInitialization_24PythonRelatedInitializ
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx__function);
     __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
-    __pyx_t_7 = 0;
+    __pyx_t_6 = 0;
   }
   #endif
   {
-    PyObject *__pyx_callargs[3 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, __pyx_t_5, __pyx_t_6};
-    __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_frequency, __pyx_mstate_global->__pyx_int_400000, __pyx_t_3, __pyx_callargs+3, 0) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_4, __pyx_callargs+__pyx_t_7, (3-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_3);
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_5};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_v_reset_pin = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "PythonRelatedInitialization.pyx":9
+ *     def initialize():
+ *         reset_pin = digitalio.DigitalInOut(board.D21)
+ *         reset_pin.direction = digitalio.Direction.OUTPUT             # <<<<<<<<<<<<<<
+ *         # Initialize I2C bus and store in static variable
+ *         reset_pin.value = False
+*/
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_digitalio); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_Direction); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_i2c, __pyx_t_1) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_OUTPUT); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_reset_pin, __pyx_mstate_global->__pyx_n_u_direction, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "PythonRelatedInitialization.pyx":11
+ *         reset_pin.direction = digitalio.Direction.OUTPUT
+ *         # Initialize I2C bus and store in static variable
+ *         reset_pin.value = False             # <<<<<<<<<<<<<<
+ *         time.sleep(0.02)
+ *         reset_pin.value = True
+*/
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_reset_pin, __pyx_mstate_global->__pyx_n_u_value, Py_False) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+
+  /* "PythonRelatedInitialization.pyx":12
+ *         # Initialize I2C bus and store in static variable
+ *         reset_pin.value = False
+ *         time.sleep(0.02)             # <<<<<<<<<<<<<<
+ *         reset_pin.value = True
+ *         time.sleep(0.5)
+*/
+  __pyx_t_4 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_sleep); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_6 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    assert(__pyx_t_4);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
+    __Pyx_INCREF(__pyx_t_4);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
+    __pyx_t_6 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_float_0_02};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "PythonRelatedInitialization.pyx":13
+ *         reset_pin.value = False
+ *         time.sleep(0.02)
+ *         reset_pin.value = True             # <<<<<<<<<<<<<<
+ *         time.sleep(0.5)
+ *         PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA,frequency=800000)
+*/
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_reset_pin, __pyx_mstate_global->__pyx_n_u_value, Py_True) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+
+  /* "PythonRelatedInitialization.pyx":14
+ *         time.sleep(0.02)
+ *         reset_pin.value = True
+ *         time.sleep(0.5)             # <<<<<<<<<<<<<<
+ *         PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA,frequency=800000)
+ * 
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_time); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_sleep); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_6 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_5))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_5);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
+    __pyx_t_6 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_float_0_5};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "PythonRelatedInitialization.pyx":15
+ *         reset_pin.value = True
+ *         time.sleep(0.5)
+ *         PythonRelatedInitializer.i2c = busio.I2C(board.SCL, board.SDA,frequency=800000)             # <<<<<<<<<<<<<<
+ * 
+*/
+  __pyx_t_5 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_busio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_I2C); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_board); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_SCL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_board); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_SDA); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_6 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+    assert(__pyx_t_5);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+    __Pyx_INCREF(__pyx_t_5);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+    __pyx_t_6 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_5, __pyx_t_3, __pyx_t_7};
+    __pyx_t_2 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_frequency, __pyx_mstate_global->__pyx_int_800000, __pyx_t_2, __pyx_callargs+3, 0) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder(__pyx_t_4, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  if (__Pyx_PyObject_SetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_i2c, __pyx_t_1) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "PythonRelatedInitialization.pyx":7
+  /* "PythonRelatedInitialization.pyx":6
  *     i2c = None
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def initialize():
- *         # Initialize I2C bus and store in static variable
+ *         reset_pin = digitalio.DigitalInOut(board.D21)
 */
 
   /* function exit code */
@@ -2452,10 +2627,11 @@ static PyObject *__pyx_pf_27PythonRelatedInitialization_24PythonRelatedInitializ
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
   __Pyx_AddTraceback("PythonRelatedInitialization.PythonRelatedInitializer.initialize", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_reset_pin);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -2831,9 +3007,9 @@ __Pyx_RefNannySetupContext("PyInit_PythonRelatedInitialization", 0);
   /*--- Execution code ---*/
 
   /* "PythonRelatedInitialization.pyx":1
- * import board, busio             # <<<<<<<<<<<<<<
- * 
+ * import board, busio, digitalio, time             # <<<<<<<<<<<<<<
  * class PythonRelatedInitializer:
+ *     # public static variable
 */
   __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_board, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2843,37 +3019,44 @@ __Pyx_RefNannySetupContext("PyInit_PythonRelatedInitialization", 0);
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_busio, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_digitalio, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_digitalio, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_mstate_global->__pyx_n_u_time, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_time, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PythonRelatedInitialization.pyx":3
- * import board, busio
- * 
+  /* "PythonRelatedInitialization.pyx":2
+ * import board, busio, digitalio, time
  * class PythonRelatedInitializer:             # <<<<<<<<<<<<<<
  *     # public static variable
  *     i2c = None
 */
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_mstate_global->__pyx_empty_tuple, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, (PyObject *) NULL, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitialization, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 3, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_mstate_global->__pyx_empty_tuple, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, (PyObject *) NULL, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitialization, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "PythonRelatedInitialization.pyx":5
+  /* "PythonRelatedInitialization.pyx":4
  * class PythonRelatedInitializer:
  *     # public static variable
  *     i2c = None             # <<<<<<<<<<<<<<
  * 
  *     @staticmethod
 */
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_i2c, Py_None) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_i2c, Py_None) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
 
-  /* "PythonRelatedInitialization.pyx":7
+  /* "PythonRelatedInitialization.pyx":6
  *     i2c = None
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def initialize():
- *         # Initialize I2C bus and store in static variable
+ *         reset_pin = digitalio.DigitalInOut(board.D21)
 */
   __pyx_t_4 = NULL;
   __Pyx_INCREF(__pyx_builtin_staticmethod);
   __pyx_t_5 = __pyx_builtin_staticmethod; 
-  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_27PythonRelatedInitialization_24PythonRelatedInitializer_1initialize, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer_initial, NULL, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitialization, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_CyFunction_New(&__pyx_mdef_27PythonRelatedInitialization_24PythonRelatedInitializer_1initialize, __Pyx_CYFUNCTION_STATICMETHOD, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer_initial, NULL, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitialization, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = 1;
   {
@@ -2882,29 +3065,28 @@ __Pyx_RefNannySetupContext("PyInit_PythonRelatedInitialization", 0);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 7, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 6, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
   }
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_initialize, __pyx_t_3) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_initialize, __pyx_t_3) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "PythonRelatedInitialization.pyx":3
- * import board, busio
- * 
+  /* "PythonRelatedInitialization.pyx":2
+ * import board, busio, digitalio, time
  * class PythonRelatedInitializer:             # <<<<<<<<<<<<<<
  *     # public static variable
  *     i2c = None
 */
-  __pyx_t_3 = __Pyx_Py3ClassCreate(((PyObject*)&PyType_Type), __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_mstate_global->__pyx_empty_tuple, __pyx_t_2, NULL, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 3, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Py3ClassCreate(((PyObject*)&PyType_Type), __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_mstate_global->__pyx_empty_tuple, __pyx_t_2, NULL, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_t_3) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_PythonRelatedInitializer, __pyx_t_3) < 0) __PYX_ERR(0, 2, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "PythonRelatedInitialization.pyx":1
- * import board, busio             # <<<<<<<<<<<<<<
- * 
+ * import board, busio, digitalio, time             # <<<<<<<<<<<<<<
  * class PythonRelatedInitializer:
+ *     # public static variable
 */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2974,7 +3156,11 @@ typedef struct {
 static const char * const __pyx_string_tab_encodings[] = { 0 };
 static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_, sizeof(__pyx_k_), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_ */
+  {__pyx_k_D21, sizeof(__pyx_k_D21), 0, 1, 1}, /* PyObject cname: __pyx_n_u_D21 */
+  {__pyx_k_DigitalInOut, sizeof(__pyx_k_DigitalInOut), 0, 1, 1}, /* PyObject cname: __pyx_n_u_DigitalInOut */
+  {__pyx_k_Direction, sizeof(__pyx_k_Direction), 0, 1, 1}, /* PyObject cname: __pyx_n_u_Direction */
   {__pyx_k_I2C, sizeof(__pyx_k_I2C), 0, 1, 1}, /* PyObject cname: __pyx_n_u_I2C */
+  {__pyx_k_OUTPUT, sizeof(__pyx_k_OUTPUT), 0, 1, 1}, /* PyObject cname: __pyx_n_u_OUTPUT */
   {__pyx_k_PythonRelatedInitialization, sizeof(__pyx_k_PythonRelatedInitialization), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PythonRelatedInitialization */
   {__pyx_k_PythonRelatedInitialization_pyx, sizeof(__pyx_k_PythonRelatedInitialization_pyx), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_PythonRelatedInitialization_pyx */
   {__pyx_k_PythonRelatedInitializer, sizeof(__pyx_k_PythonRelatedInitializer), 0, 1, 1}, /* PyObject cname: __pyx_n_u_PythonRelatedInitializer */
@@ -2985,6 +3171,8 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_board, sizeof(__pyx_k_board), 0, 1, 1}, /* PyObject cname: __pyx_n_u_board */
   {__pyx_k_busio, sizeof(__pyx_k_busio), 0, 1, 1}, /* PyObject cname: __pyx_n_u_busio */
   {__pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 1, 1}, /* PyObject cname: __pyx_n_u_cline_in_traceback */
+  {__pyx_k_digitalio, sizeof(__pyx_k_digitalio), 0, 1, 1}, /* PyObject cname: __pyx_n_u_digitalio */
+  {__pyx_k_direction, sizeof(__pyx_k_direction), 0, 1, 1}, /* PyObject cname: __pyx_n_u_direction */
   {__pyx_k_doc, sizeof(__pyx_k_doc), 0, 1, 1}, /* PyObject cname: __pyx_n_u_doc */
   {__pyx_k_frequency, sizeof(__pyx_k_frequency), 0, 1, 1}, /* PyObject cname: __pyx_n_u_frequency */
   {__pyx_k_func, sizeof(__pyx_k_func), 0, 1, 1}, /* PyObject cname: __pyx_n_u_func */
@@ -2998,10 +3186,14 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_name, sizeof(__pyx_k_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_name */
   {__pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 1, 1}, /* PyObject cname: __pyx_n_u_prepare */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
+  {__pyx_k_reset_pin, sizeof(__pyx_k_reset_pin), 0, 1, 1}, /* PyObject cname: __pyx_n_u_reset_pin */
   {__pyx_k_set_name, sizeof(__pyx_k_set_name), 0, 1, 1}, /* PyObject cname: __pyx_n_u_set_name */
+  {__pyx_k_sleep, sizeof(__pyx_k_sleep), 0, 1, 1}, /* PyObject cname: __pyx_n_u_sleep */
   {__pyx_k_spec, sizeof(__pyx_k_spec), 0, 1, 1}, /* PyObject cname: __pyx_n_u_spec */
   {__pyx_k_staticmethod, sizeof(__pyx_k_staticmethod), 0, 1, 1}, /* PyObject cname: __pyx_n_u_staticmethod */
   {__pyx_k_test, sizeof(__pyx_k_test), 0, 1, 1}, /* PyObject cname: __pyx_n_u_test */
+  {__pyx_k_time, sizeof(__pyx_k_time), 0, 1, 1}, /* PyObject cname: __pyx_n_u_time */
+  {__pyx_k_value, sizeof(__pyx_k_value), 0, 1, 1}, /* PyObject cname: __pyx_n_u_value */
   {0, 0, 0, 0, 0}
 };
 /* InitStrings.proto */
@@ -3011,7 +3203,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry const *t, PyObject **target, c
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 6, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -3030,7 +3222,9 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   if (__Pyx_InitStrings(__pyx_string_tab, __pyx_mstate->__pyx_string_tab, __pyx_string_tab_encodings) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
-  __pyx_mstate->__pyx_int_400000 = PyLong_FromLong(400000L); if (unlikely(!__pyx_mstate->__pyx_int_400000)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_float_0_5 = PyFloat_FromDouble(0.5); if (unlikely(!__pyx_mstate->__pyx_float_0_5)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_float_0_02 = PyFloat_FromDouble(0.02); if (unlikely(!__pyx_mstate->__pyx_float_0_02)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_mstate->__pyx_int_800000 = PyLong_FromLong(800000L); if (unlikely(!__pyx_mstate->__pyx_int_800000)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -3044,7 +3238,7 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
             unsigned int nlocals : 1;
             unsigned int flags : 10;
             unsigned int first_line : 3;
-            unsigned int line_table_length : 10;
+            unsigned int line_table_length : 11;
         } __Pyx_PyCode_New_function_description;
 /* NewCodeObj.proto */
 static PyObject* __Pyx_PyCode_New(
@@ -3061,9 +3255,9 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   PyObject* tuple_dedup_map = PyDict_New();
   if (unlikely(!tuple_dedup_map)) return -1;
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 7, 28};
-    PyObject* const varnames[] = {0};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_PythonRelatedInitialization_pyx, __pyx_mstate->__pyx_n_u_initialize, __pyx_k_A_uD_fE_jPQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 6, 82};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_reset_pin};
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_PythonRelatedInitialization_pyx, __pyx_mstate->__pyx_n_u_initialize, __pyx_k_A_I_5_iz_F_1_F_1_uD_fE_jPQ, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;
@@ -3825,6 +4019,16 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObj
     #endif
 }
 
+/* PyObjectSetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_setattro))
+        return tp->tp_setattro(obj, attr_name, value);
+    return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
 /* PyObjectVectorCallKwBuilder */
 #if CYTHON_VECTORCALL
 static int __Pyx_VectorcallBuilder_AddArg(PyObject *key, PyObject *value, PyObject *builder, PyObject **args, int n) {
@@ -3854,16 +4058,6 @@ CYTHON_UNUSED static int __Pyx_VectorcallBuilder_AddArg_Check(PyObject *key, PyO
         return -1;
     }
     return PyDict_SetItem(builder, key, value);
-}
-#endif
-
-/* PyObjectSetAttrStr */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_setattro))
-        return tp->tp_setattro(obj, attr_name, value);
-    return PyObject_SetAttr(obj, attr_name, value);
 }
 #endif
 
